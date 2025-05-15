@@ -1,160 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FAQs - TaxManager</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advanced UI Color Panel</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #f9f9f9;
+      background: #f5f7fa;
       margin: 0;
-      padding: 50px 20px;
+      padding: 2rem;
     }
-
-    .faq-section {
-      max-width: 900px;
-      margin: auto;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
-      padding: 40px;
-    }
-
-    .faq-title {
+    h1 {
       text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      position: relative;
-      color: #1a1a1a;
-    }
-
-    .faq-title::after {
-      content: "";
-      width: 60px;
-      height: 4px;
-      background-color: #2e7d32;
-      display: block;
-      margin: 10px auto 0;
-      border-radius: 4px;
-    }
-
-    .faq-item {
-      border-bottom: 1px solid #eee;
-    }
-
-    .faq-question {
-      cursor: pointer;
-      padding: 18px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 18px;
-      font-weight: 600;
       color: #333;
-      transition: 0.3s;
     }
-
-    .faq-question:hover {
-      background: #f1f5ff;
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2rem 0 1rem;
+      color: #222;
     }
-
-    .faq-answer {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s ease;
-      padding: 0 20px;
-      color: #555;
-      font-size: 16px;
+    .palette-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
     }
-
-    .faq-item.active .faq-answer {
-      max-height: 200px;
-      padding-bottom: 15px;
+    .color-card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      text-align: center;
     }
-
-    .faq-icon {
-      font-size: 20px;
-      transition: transform 0.3s ease;
+    .color-box {
+      width: 100%;
+      height: 80px;
+      border-radius: 8px;
+      margin-bottom: 0.8rem;
+      cursor: pointer;
     }
-
-    .faq-item.active .faq-icon {
-      transform: rotate(180deg);
+    .label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #444;
+    }
+    .hex {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.3rem;
+    }
+    input[type="color"] {
+      display: block;
+      margin: 1rem auto 2rem auto;
+      padding: 0.5rem;
+    }
+    .preview-box {
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .export-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .dark-mode-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    body.dark-mode {
+      background: #121212;
+      color: #f5f5f5;
+    }
+    body.dark-mode .color-card {
+      background: #1e1e1e;
+      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+    }
+    body.dark-mode .export-btn {
+      background: #0a84ff;
     }
   </style>
 </head>
 <body>
 
-  <section class="faq-section">
-    <h2 class="faq-title">Frequently Asked Questions – FAQs</h2>
+<button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+<h1>Advanced UI Color Panel</h1>
 
-    <div class="faq-item">
-      <div class="faq-question">
-        Can I file an Income Tax Return using Taxmanager.in services?
-        <span class="faq-icon">&#9660;</span>
-      </div>
-      <div class="faq-answer">
-        Yes! You can file your ITR quickly and securely with TaxManager’s guided filing system. Simply follow our steps and upload the required documents.
-      </div>
-    </div>
+<div class="section-title">1. Select a Base Color</div>
+<input type="color" id="baseColor" value="#007BFF" />
 
-    <div class="faq-item">
-      <div class="faq-question">
-        What are the steps for filing an Income Tax Return?
-        <span class="faq-icon">&#9660;</span>
-      </div>
-      <div class="faq-answer">
-        1. Register/Login to TaxManager<br>
-        2. Enter personal + financial details<br>
-        3. Upload Form 16 / other docs<br>
-        4. Preview and file your return
-      </div>
-    </div>
+<div class="section-title">2. Color Shades (Light + Dark)</div>
+<div id="shadeContainer" class="palette-container"></div>
 
-    <div class="faq-item">
-      <div class="faq-question">
-        How can I create my ITR?
-        <span class="faq-icon">&#9660;</span>
-      </div>
-      <div class="faq-answer">
-        Simply fill your basic details, choose ITR type, and TaxManager will auto-generate your return. Review and file in one click.
-      </div>
-    </div>
+<div class="section-title">3. Contrast Checker (vs white text)</div>
+<div id="contrastResult"></div>
 
-    <div class="faq-item">
-      <div class="faq-question">
-        How to fill Tax Return details?
-        <span class="faq-icon">&#9660;</span>
-      </div>
-      <div class="faq-answer">
-        You will be guided section by section for each income, deduction, and bank account. Smart hints make it easy.
-      </div>
-    </div>
+<div class="section-title">4. Text Preview</div>
+<div id="textPreview" class="preview-box" style="background: #007BFF; color: #ffffff">
+  <h3>Heading Text</h3>
+  <p>This is paragraph text preview.</p>
+</div>
 
-    <div class="faq-item">
-      <div class="faq-question">
-        How to fill Income Sources Details?
-        <span class="faq-icon">&#9660;</span>
-      </div>
-      <div class="faq-answer">
-        Add sources like salary, rental income, capital gains, etc., with TaxManager’s intuitive inputs. You can also import from Form 26AS.
-      </div>
-    </div>
-  </section>
+<div class="section-title">5. Color Harmony</div>
+<div id="harmonyContainer" class="palette-container"></div>
 
-  <script>
-    const items = document.querySelectorAll(".faq-item");
+<button class="export-btn" onclick="downloadPalette()">Export Palette</button>
 
-    items.forEach(item => {
-      item.addEventListener("click", () => {
-        item.classList.toggle("active");
-        items.forEach(i => {
-          if (i !== item) i.classList.remove("active");
-        });
-      });
+<script>
+  const baseColorInput = document.getElementById("baseColor");
+  const shadeContainer = document.getElementById("shadeContainer");
+  const contrastResult = document.getElementById("contrastResult");
+  const textPreview = document.getElementById("textPreview");
+  const harmonyContainer = document.getElementById("harmonyContainer");
+
+  function hexToRgb(hex) {
+    let bigint = parseInt(hex.slice(1), 16);
+    return {
+      r: (bigint >> 16) & 255,
+      g: (bigint >> 8) & 255,
+      b: bigint & 255
+    };
+  }
+
+  function rgbToHex(r, g, b) {
+    return (
+      "#" +
+      [r, g, b].map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      }).join("")
+    );
+  }
+
+  function interpolateColor(color1, color2, factor) {
+    const result = {
+      r: Math.round(color1.r + (color2.r - color1.r) * factor),
+      g: Math.round(color1.g + (color2.g - color1.g) * factor),
+      b: Math.round(color1.b + (color2.b - color1.b) * factor)
+    };
+    return rgbToHex(result.r, result.g, result.b);
+  }
+
+  function generateShades(hex) {
+    const base = hexToRgb(hex);
+    shadeContainer.innerHTML = "";
+    // Light shades (towards white)
+    for (let i = 5; i >= 1; i--) {
+      const factor = i / 6;
+      const light = interpolateColor(base, { r: 255, g: 255, b: 255 }, factor);
+      addShadeCard(light, `Light ${i}`);
+    }
+    // Base color
+    addShadeCard(hex, "Base");
+    // Dark shades (towards black)
+    for (let i = 1; i <= 5; i++) {
+      const factor = i / 6;
+      const dark = interpolateColor(base, { r: 0, g: 0, b: 0 }, factor);
+      addShadeCard(dark, `Dark ${i}`);
+    }
+  }
+
+  function addShadeCard(color, label) {
+    let card = document.createElement("div");
+    card.className = "color-card";
+    card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>${label}</div><div class='hex'>${color}</div>`;
+    shadeContainer.appendChild(card);
+  }
+
+  function checkContrast(hex) {
+    const { r, g, b } = hexToRgb(hex);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const contrast = luminance > 0.5 ? "Dark text recommended" : "Light text recommended";
+    contrastResult.innerText = contrast;
+  }
+
+  function updateTextPreview(hex) {
+    textPreview.style.background = hex;
+    const { r, g, b } = hexToRgb(hex);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    textPreview.style.color = luminance > 0.5 ? "#000000" : "#ffffff";
+  }
+
+  function generateHarmony(hex) {
+    harmonyContainer.innerHTML = "";
+    const { r, g, b } = hexToRgb(hex);
+    const comp = rgbToHex(255 - r, 255 - g, 255 - b);
+    const analogous1 = rgbToHex((r + 30) % 256, g, b);
+    const analogous2 = rgbToHex((r + 60) % 256, g, b);
+    [hex, comp, analogous1, analogous2].forEach(color => {
+      let card = document.createElement("div");
+      card.className = "color-card";
+      card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>Harmony</div><div class='hex'>${color}</div>`;
+      harmonyContainer.appendChild(card);
     });
-  </script>
+  }
 
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => alert("Copied: " + text));
+  }
+
+  function downloadPalette() {
+    const shades = [...shadeContainer.querySelectorAll(".hex")].map(e => e.textContent);
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(shades, null, 2));
+    const dlAnchor = document.createElement("a");
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", "palette.json");
+    dlAnchor.click();
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+  }
+
+  baseColorInput.addEventListener("input", e => {
+    const color = e.target.value;
+    generateShades(color);
+    checkContrast(color);
+    updateTextPreview(color);
+    generateHarmony(color);
+  });
+
+  window.onload = () => {
+    const initial = baseColorInput.value;
+    generateShades(initial);
+    checkContrast(initial);
+    updateTextPreview(initial);
+    generateHarmony(initial);
+  };
+</script>
 </body>
 </html>
