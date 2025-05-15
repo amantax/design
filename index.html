@@ -50,10 +50,11 @@
       color: #666;
       margin-top: 0.3rem;
     }
-    input[type="color"] {
+    input[type="color"], input[type="text"], select {
       display: block;
       margin: 1rem auto 2rem auto;
       padding: 0.5rem;
+      text-align: center;
     }
     .preview-box {
       padding: 1rem;
@@ -99,32 +100,55 @@
 <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
 <h1>Advanced UI Color Panel</h1>
 
-<div class="section-title">1. Select a Base Color</div>
-<input type="color" id="baseColor" value="#007BFF" />
+<div class="section-title">1. Select or Paste a Base Color</div>
+<input type="color" id="baseColor" value="#7ea8d2" />
+<input type="text" id="baseColorText" placeholder="#7ea8d2" value="#7ea8d2" />
 
 <div class="section-title">2. Color Shades (Light + Dark)</div>
 <div id="shadeContainer" class="palette-container"></div>
 
-<div class="section-title">3. Contrast Checker (vs white text)</div>
+<div class="section-title">3. Gradient Generator</div>
+<input type="color" id="gradientStart" value="#007BFF" />
+<input type="color" id="gradientEnd" value="#FF5722" />
+<div id="gradientPreview" class="preview-box"></div>
+<pre id="gradientCSS" style="margin-top:10px"></pre>
+
+<div class="section-title">4. Prebuilt Color Palettes</div>
+<select id="prebuiltPalettes">
+  <option value="">Select a Theme</option>
+  <option value="tailwind">Tailwind</option>
+  <option value="material">Material UI</option>
+  <option value="flatui">Flat UI</option>
+</select>
+<div id="prebuiltContainer" class="palette-container"></div>
+
+<div class="section-title">5. Contrast Checker (vs white text)</div>
 <div id="contrastResult"></div>
 
-<div class="section-title">4. Text Preview</div>
-<div id="textPreview" class="preview-box" style="background: #007BFF; color: #ffffff">
+<div class="section-title">6. Text Preview</div>
+<div id="textPreview" class="preview-box" style="background: #7ea8d2; color: #ffffff">
   <h3>Heading Text</h3>
   <p>This is paragraph text preview.</p>
 </div>
 
-<div class="section-title">5. Color Harmony</div>
+<div class="section-title">7. Color Harmony</div>
 <div id="harmonyContainer" class="palette-container"></div>
 
 <button class="export-btn" onclick="downloadPalette()">Export Palette</button>
 
 <script>
   const baseColorInput = document.getElementById("baseColor");
+  const baseColorText = document.getElementById("baseColorText");
   const shadeContainer = document.getElementById("shadeContainer");
   const contrastResult = document.getElementById("contrastResult");
   const textPreview = document.getElementById("textPreview");
   const harmonyContainer = document.getElementById("harmonyContainer");
+  const prebuiltContainer = document.getElementById("prebuiltContainer");
+  const gradientPreview = document.getElementById("gradientPreview");
+  const gradientCSS = document.getElementById("gradientCSS");
+  const gradientStart = document.getElementById("gradientStart");
+  const gradientEnd = document.getElementById("gradientEnd");
+  const prebuiltPalettes = document.getElementById("prebuiltPalettes");
 
   function hexToRgb(hex) {
     let bigint = parseInt(hex.slice(1), 16);
@@ -137,11 +161,7 @@
 
   function rgbToHex(r, g, b) {
     return (
-      "#" +
-      [r, g, b].map(x => {
-        const hex = x.toString(16);
-        return hex.length === 1 ? "0" + hex : hex;
-      }).join("")
+      "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")
     );
   }
 
@@ -157,15 +177,12 @@
   function generateShades(hex) {
     const base = hexToRgb(hex);
     shadeContainer.innerHTML = "";
-    // Light shades (towards white)
     for (let i = 5; i >= 1; i--) {
       const factor = i / 6;
       const light = interpolateColor(base, { r: 255, g: 255, b: 255 }, factor);
       addShadeCard(light, `Light ${i}`);
     }
-    // Base color
     addShadeCard(hex, "Base");
-    // Dark shades (towards black)
     for (let i = 1; i <= 5; i++) {
       const factor = i / 6;
       const dark = interpolateColor(base, { r: 0, g: 0, b: 0 }, factor);
@@ -225,20 +242,50 @@
     document.body.classList.toggle("dark-mode");
   }
 
-  baseColorInput.addEventListener("input", e => {
-    const color = e.target.value;
+  function updateGradientPreview() {
+    const start = gradientStart.value;
+    const end = gradientEnd.value;
+    const gradient = `linear-gradient(90deg, ${start}, ${end})`;
+    gradientPreview.style.background = gradient;
+    gradientCSS.innerText = `background: ${gradient};`;
+  }
+
+  function loadPrebuiltPalette(theme) {
+    prebuiltContainer.innerHTML = "";
+    const palettes = {
+      tailwind: ["#0d9488", "#3b82f6", "#6366f1", "#f59e0b", "#ef4444"],
+      material: ["#6200ea", "#03dac5", "#ff0266", "#3700b3", "#018786"],
+      flatui: ["#1abc9c", "#2ecc71", "#3498db", "#e74c3c", "#9b59b6"]
+    };
+    if (palettes[theme]) {
+      palettes[theme].forEach(color => {
+        let card = document.createElement("div");
+        card.className = "color-card";
+        card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>${theme.toUpperCase()}</div><div class='hex'>${color}</div>`;
+        prebuiltContainer.appendChild(card);
+      });
+    }
+  }
+
+  function setBaseColor(color) {
+    baseColorInput.value = color;
+    baseColorText.value = color;
     generateShades(color);
     checkContrast(color);
     updateTextPreview(color);
     generateHarmony(color);
-  });
+  }
+
+  baseColorInput.addEventListener("input", e => setBaseColor(e.target.value));
+  baseColorText.addEventListener("input", e => setBaseColor(e.target.value));
+  gradientStart.addEventListener("input", updateGradientPreview);
+  gradientEnd.addEventListener("input", updateGradientPreview);
+  prebuiltPalettes.addEventListener("change", e => loadPrebuiltPalette(e.target.value));
 
   window.onload = () => {
     const initial = baseColorInput.value;
-    generateShades(initial);
-    checkContrast(initial);
-    updateTextPreview(initial);
-    generateHarmony(initial);
+    setBaseColor(initial);
+    updateGradientPreview();
   };
 </script>
 </body>
