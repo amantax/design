@@ -2,18 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aman UI Design Color Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aman UI Design Color Panel - Enhanced</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fa;
       margin: 0;
       padding: 2rem;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
     }
     h1 {
       text-align: center;
-      color: #333;
+      color: #222;
     }
     .section-title {
       font-size: 1.5rem;
@@ -23,8 +25,8 @@
     }
     .palette-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
     }
     .color-card {
       background: #fff;
@@ -32,13 +34,18 @@
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s;
+    }
+    .color-card:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .color-box {
       width: 100%;
       height: 80px;
       border-radius: 8px;
-      margin-bottom: 0.8rem;
-      cursor: pointer;
+      margin-bottom: 0.6rem;
     }
     .label {
       font-weight: 600;
@@ -49,27 +56,52 @@
       font-size: 0.85rem;
       color: #666;
       margin-top: 0.3rem;
+      font-family: monospace;
     }
-    input[type="color"], input[type="text"], select {
+    input[type="color"], input[type="text"], select, button {
       display: block;
-      margin: 1rem auto 2rem auto;
+      margin: 0.5rem auto 1rem auto;
       padding: 0.5rem;
       text-align: center;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 150px;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    input[type="text"] {
+      width: 120px;
+      text-transform: uppercase;
+      font-family: monospace;
+    }
+    input[type="text"]:focus, input[type="color"]:focus, select:focus {
+      border-color: #007BFF;
+      outline: none;
     }
     .preview-box {
       padding: 1rem;
       border-radius: 8px;
       margin-top: 1rem;
       text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      user-select: none;
+      transition: background-color 0.3s, color 0.3s;
     }
     .export-btn {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      margin-top: 2rem;
+      padding: 0.6rem 1.2rem;
       background: #007BFF;
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+    .export-btn:hover {
+      background: #0056b3;
     }
     .dark-mode-toggle {
       position: fixed;
@@ -81,6 +113,9 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+      z-index: 1000;
     }
     body.dark-mode {
       background: #121212;
@@ -90,203 +125,625 @@
       background: #1e1e1e;
       box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
     }
+    body.dark-mode input, body.dark-mode select {
+      background: #333;
+      color: #f5f5f5;
+      border-color: #555;
+    }
     body.dark-mode .export-btn {
       background: #0a84ff;
+    }
+    /* Flex layout for sections needing horizontal controls */
+    .flex-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    /* HSL sliders */
+    .hsl-slider {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      max-width: 300px;
+      margin: 0.3rem auto;
+    }
+    .hsl-slider label {
+      width: 40px;
+      font-weight: 600;
+    }
+    .hsl-slider input[type="range"] {
+      flex-grow: 1;
+      cursor: pointer;
+    }
+    /* Color blindness simulator preview */
+    .cb-preview {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .cb-preview .color-card {
+      width: 140px;
+      user-select: none;
+    }
+    /* Live UI preview */
+    #livePreviewPanel {
+      max-width: 600px;
+      margin: 1rem auto;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      background: #fff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode #livePreviewPanel {
+      background: #1e1e1e;
+      color: #f5f5f5;
+    }
+    #livePreviewPanel button {
+      background-color: var(--primary, #007bff);
+      color: var(--primary-text, #fff);
+      border: none;
+      padding: 0.5rem 1rem;
+      margin: 0.3rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    #livePreviewPanel button:hover {
+      background-color: var(--primary-hover, #0056b3);
+    }
+    #livePreviewPanel .card {
+      border: 1px solid var(--primary, #007bff);
+      padding: 1rem;
+      border-radius: 10px;
+      margin: 1rem 0;
+      background-color: var(--card-bg, #e0e7ff);
+      color: var(--card-text, #000);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    /* Typography pairing */
+    #typographyPairing {
+      max-width: 600px;
+      margin: 1rem auto;
+      text-align: center;
+    }
+    #typographyPairing h3 {
+      margin-bottom: 0.3rem;
+    }
+    #typographyPairing p {
+      font-size: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
     }
   </style>
 </head>
 <body>
 
 <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-<h1>Aman UI Design Color Panel</h1>
+<h1>Aman UI Design Color Panel - Enhanced</h1>
 
+<!-- 1. Select or Paste a Base Color -->
 <div class="section-title">1. Select or Paste a Base Color</div>
-<input type="color" id="baseColor" value="#7ea8d2" />
-<input type="text" id="baseColorText" placeholder="#7ea8d2" value="#7ea8d2" />
-
-<div class="section-title">2. Color Shades (Light + Dark)</div>
-<div id="shadeContainer" class="palette-container"></div>
-
-<div class="section-title">3. Gradient Generator</div>
-<input type="color" id="gradientStart" value="#007BFF" />
-<input type="color" id="gradientEnd" value="#FF5722" />
-<div id="gradientPreview" class="preview-box"></div>
-<pre id="gradientCSS" style="margin-top:10px"></pre>
-
-<div class="section-title">4. Prebuilt Color Palettes</div>
-<select id="prebuiltPalettes">
-  <option value="">Select a Theme</option>
-  <option value="tailwind">Tailwind</option>
-  <option value="material">Material UI</option>
-  <option value="flatui">Flat UI</option>
-</select>
-<div id="prebuiltContainer" class="palette-container"></div>
-
-<div class="section-title">5. Contrast Checker (vs white text)</div>
-<div id="contrastResult"></div>
-
-<div class="section-title">6. Text Preview</div>
-<div id="textPreview" class="preview-box" style="background: #7ea8d2; color: #ffffff">
-  <h3>Heading Text</h3>
-  <p>This is paragraph text preview.</p>
+<div class="flex-row" style="justify-content:center; gap: 1rem;">
+  <input type="color" id="baseColor" value="#7ea8d2" title="Pick base color"/>
+  <input type="text" id="baseColorText" placeholder="#7EA8D2" maxlength="7" />
 </div>
 
-<div class="section-title">7. Color Harmony</div>
-<div id="harmonyContainer" class="palette-container"></div>
+<!-- 11. Interactive Color Picker -->
+<div class="section-title">2. Interactive HSL Color Picker</div>
+<div id="hslPicker" style="max-width:320px; margin:auto;">
+  <div class="hsl-slider">
+    <label for="hueRange">Hue</label>
+    <input type="range" id="hueRange" min="0" max="360" />
+  </div>
+  <div class="hsl-slider">
+    <label for="satRange">Sat</label>
+    <input type="range" id="satRange" min="0" max="100" />
+  </div>
+  <div class="hsl-slider">
+    <label for="lightRange">Light</label>
+    <input type="range" id="lightRange" min="0" max="100" />
+  </div>
+  <button id="eyeDropperBtn" title="Pick color from screen">🎨 Use Eyedropper</button>
+</div>
 
-<button class="export-btn" onclick="downloadPalette()">Export Palette</button>
+<!-- 2. Color Shades (Light + Dark) -->
+<div class="section-title">3. Generated Color Shades</div>
+<div class="palette-container" id="shadesContainer"></div>
+
+<!-- 5. More Color Harmonies -->
+<div class="section-title">4. Color Harmonies</div>
+<div style="text-align:center;">
+  <select id="harmonyType">
+    <option value="complementary">Complementary</option>
+    <option value="analogous">Analogous</option>
+    <option value="splitComplementary">Split Complementary</option>
+    <option value="triadic">Triadic</option>
+    <option value="tetradic">Tetradic</option>
+    <option value="square">Square</option>
+  </select>
+</div>
+<div class="palette-container" id="harmonyContainer"></div>
+
+<!-- 4. Custom Gradient Generator -->
+<div class="section-title">5. Custom Gradient Generator</div>
+<div style="max-width: 480px; margin: auto;">
+  <div id="gradientColorsContainer" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;"></div>
+  <button id="addGradientColorBtn" style="margin-bottom: 1rem;">+ Add Color Stop</button>
+  <label for="gradientAngle">Gradient Angle: <span id="angleValue">90</span>°</label>
+  <input type="range" id="gradientAngle" min="0" max="360" value="90" />
+  <div id="gradientPreview" class="preview-box" style="height: 100px; margin-top:1rem; border: 2px solid #ccc; border-radius: 12px;"></div>
+  <textarea id="gradientCSS" rows="2" style="width:100%; margin-top: 0.5rem;" readonly></textarea>
+</div>
+
+<!-- 3. Color Blindness Simulator -->
+<div class="section-title">6. Color Blindness Simulator</div>
+<div style="text-align:center; margin-bottom:1rem;">
+  <select id="colorBlindnessType">
+    <option value="none">None (Normal)</option>
+    <option value="protanopia">Protanopia</option>
+    <option value="deuteranopia">Deuteranopia</option>
+    <option value="tritanopia">Tritanopia</option>
+  </select>
+</div>
+<div class="cb-preview" id="cbPalettePreview"></div>
+
+<!-- 7. Live Preview of UI Components -->
+<div class="section-title">7. Live Preview of UI Components</div>
+<div id="livePreviewPanel">
+  <h2>Preview Panel</h2>
+  <button>Primary Button</button>
+  <button disabled>Disabled Button</button>
+  <div class="card">
+    <h3>Card Title</h3>
+    <p>This is a card example styled with your palette.</p>
+  </div>
+  <input type="text" placeholder="Input field" disabled style="padding:0.5rem; border-radius:6px; border:1px solid var(--primary);" />
+</div>
+
+<!-- 9. Typography Pairing Suggestions -->
+<div class="section-title">8. Typography Pairing Suggestions</div>
+<div id="typographyPairing">
+  <label for="fontPairSelect">Select Font Pair:</label>
+  <select id="fontPairSelect" style="margin-left: 0.5rem; padding: 0.3rem 0.5rem;">
+    <option value="roboto-merriweather">Roboto & Merriweather</option>
+    <option value="open-sans-lora">Open Sans & Lora</option>
+    <option value="montserrat-roboto">Montserrat & Roboto</option>
+    <option value="poppins-roboto">Poppins & Roboto</option>
+    <option value="playfair-display-raleway">Playfair Display & Raleway</option>
+  </select>
+  <h3 id="headingSample" style="font-family: Roboto, sans-serif;">Heading Sample Text</h3>
+  <p id="bodySample" style="font-family: Merriweather, serif;">Body sample text to demonstrate font pairing.</p>
+</div>
 
 <script>
-  const baseColorInput = document.getElementById("baseColor");
-  const baseColorText = document.getElementById("baseColorText");
-  const shadeContainer = document.getElementById("shadeContainer");
-  const contrastResult = document.getElementById("contrastResult");
-  const textPreview = document.getElementById("textPreview");
-  const harmonyContainer = document.getElementById("harmonyContainer");
-  const prebuiltContainer = document.getElementById("prebuiltContainer");
-  const gradientPreview = document.getElementById("gradientPreview");
-  const gradientCSS = document.getElementById("gradientCSS");
-  const gradientStart = document.getElementById("gradientStart");
-  const gradientEnd = document.getElementById("gradientEnd");
-  const prebuiltPalettes = document.getElementById("prebuiltPalettes");
-
+  // Utility functions
+  function clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+  }
+  function rgbToHex(r, g, b) {
+    return (
+      '#' +
+      [r, g, b]
+        .map(x => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('')
+        .toUpperCase()
+    );
+  }
   function hexToRgb(hex) {
-    let bigint = parseInt(hex.slice(1), 16);
+    let cleanHex = hex.replace('#', '');
+    if (cleanHex.length === 3) {
+      cleanHex = cleanHex.split('').map(x => x + x).join('');
+    }
+    const bigint = parseInt(cleanHex, 16);
     return {
       r: (bigint >> 16) & 255,
       g: (bigint >> 8) & 255,
-      b: bigint & 255
+      b: bigint & 255,
     };
   }
-
-  function rgbToHex(r, g, b) {
-    return (
-      "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("")
-    );
-  }
-
-  function interpolateColor(color1, color2, factor) {
-    const result = {
-      r: Math.round(color1.r + (color2.r - color1.r) * factor),
-      g: Math.round(color1.g + (color2.g - color1.g) * factor),
-      b: Math.round(color1.b + (color2.b - color1.b) * factor)
-    };
-    return rgbToHex(result.r, result.g, result.b);
-  }
-
-  function generateShades(hex) {
-    const base = hexToRgb(hex);
-    shadeContainer.innerHTML = "";
-    for (let i = 5; i >= 1; i--) {
-      const factor = i / 6;
-      const light = interpolateColor(base, { r: 255, g: 255, b: 255 }, factor);
-      addShadeCard(light, `Light ${i}`);
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h,
+      s,
+      l = (max + min) / 2;
+    if (max === min) {
+      h = s = 0; // achromatic
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+      h /= 6;
     }
-    addShadeCard(hex, "Base");
-    for (let i = 1; i <= 5; i++) {
-      const factor = i / 6;
-      const dark = interpolateColor(base, { r: 0, g: 0, b: 0 }, factor);
-      addShadeCard(dark, `Dark ${i}`);
+    return { h: h * 360, s: s * 100, l: l * 100 };
+  }
+  function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    let r, g, b;
+    if (s === 0) {
+      r = g = b = l; // achromatic
+    } else {
+      function hue2rgb(p, q, t) {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      }
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
     }
+    return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
   }
-
-  function addShadeCard(color, label) {
-    let card = document.createElement("div");
-    card.className = "color-card";
-    card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>${label}</div><div class='hex'>${color}</div>`;
-    shadeContainer.appendChild(card);
-  }
-
-  function checkContrast(hex) {
+  function shadeColor(hex, percent) {
     const { r, g, b } = hexToRgb(hex);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    const contrast = luminance > 0.5 ? "Dark text recommended" : "Light text recommended";
-    contrastResult.innerText = contrast;
+    const t = percent < 0 ? 0 : 255;
+    const p = Math.abs(percent);
+    const R = Math.round((t - r) * p) + r;
+    const G = Math.round((t - g) * p) + g;
+    const B = Math.round((t - b) * p) + b;
+    return rgbToHex(R, G, B);
+  }
+  function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  function updateTextPreview(hex) {
-    textPreview.style.background = hex;
-    const { r, g, b } = hexToRgb(hex);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    textPreview.style.color = luminance > 0.5 ? "#000000" : "#ffffff";
+  // Global state
+  let baseColor = '#7EA8D2';
+  let hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
+  let gradientStops = [baseColor, shadeColor(baseColor, -0.3)];
+  let gradientAngle = 90;
+
+  // DOM Elements
+  const baseColorInput = document.getElementById('baseColor');
+  const baseColorTextInput = document.getElementById('baseColorText');
+  const shadesContainer = document.getElementById('shadesContainer');
+  const harmonyContainer = document.getElementById('harmonyContainer');
+  const harmonyTypeSelect = document.getElementById('harmonyType');
+  const gradientColorsContainer = document.getElementById('gradientColorsContainer');
+  const addGradientColorBtn = document.getElementById('addGradientColorBtn');
+  const gradientAngleInput = document.getElementById('gradientAngle');
+  const angleValueSpan = document.getElementById('angleValue');
+  const gradientPreview = document.getElementById('gradientPreview');
+  const gradientCSS = document.getElementById('gradientCSS');
+  const colorBlindnessTypeSelect = document.getElementById('colorBlindnessType');
+  const cbPalettePreview = document.getElementById('cbPalettePreview');
+  const livePreviewPanel = document.getElementById('livePreviewPanel');
+  const fontPairSelect = document.getElementById('fontPairSelect');
+  const headingSample = document.getElementById('headingSample');
+  const bodySample = document.getElementById('bodySample');
+  // HSL Pickers
+  const hueRange = document.getElementById('hueRange');
+  const satRange = document.getElementById('satRange');
+  const lightRange = document.getElementById('lightRange');
+  const eyeDropperBtn = document.getElementById('eyeDropperBtn');
+
+  // Synchronize base color inputs
+  function setBaseColor(newColor) {
+    baseColor = newColor.toUpperCase();
+    baseColorInput.value = baseColor;
+    baseColorTextInput.value = baseColor;
+    hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
+    updateHslSliders();
+    updateAll();
   }
 
-  function generateHarmony(hex) {
-    harmonyContainer.innerHTML = "";
-    const { r, g, b } = hexToRgb(hex);
-    const comp = rgbToHex(255 - r, 255 - g, 255 - b);
-    const analogous1 = rgbToHex((r + 30) % 256, g, b);
-    const analogous2 = rgbToHex((r + 60) % 256, g, b);
-    [hex, comp, analogous1, analogous2].forEach(color => {
-      let card = document.createElement("div");
-      card.className = "color-card";
-      card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>Harmony</div><div class='hex'>${color}</div>`;
-      harmonyContainer.appendChild(card);
+  function updateHslSliders() {
+    hueRange.value = Math.round(hsl.h);
+    satRange.value = Math.round(hsl.s);
+    lightRange.value = Math.round(hsl.l);
+  }
+
+  baseColorInput.addEventListener('input', e => {
+    const val = e.target.value;
+    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+      setBaseColor(val);
+    }
+  });
+  baseColorTextInput.addEventListener('input', e => {
+    const val = e.target.value.trim();
+    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+      setBaseColor(val);
+    }
+  });
+
+  // HSL slider event handlers
+  function updateBaseColorFromHsl() {
+    const h = clamp(+hueRange.value, 0, 360);
+    const s = clamp(+satRange.value, 0, 100);
+    const l = clamp(+lightRange.value, 0, 100);
+    hsl = { h, s, l };
+    const { r, g, b } = hslToRgb(h, s, l);
+    setBaseColor(rgbToHex(r, g, b));
+  }
+  hueRange.addEventListener('input', updateBaseColorFromHsl);
+  satRange.addEventListener('input', updateBaseColorFromHsl);
+  lightRange.addEventListener('input', updateBaseColorFromHsl);
+
+  // Generate color shades (+ and -)
+  function generateShades(baseHex) {
+    const shades = [];
+    // 5 lighter shades (20%, 40%, 60%, 80%, 90%)
+    for (let i = 0.9; i >= 0.3; i -= 0.2) {
+      shades.push(shadeColor(baseHex, i));
+    }
+    // Base color in center
+    shades.push(baseHex);
+    // 5 darker shades (-20%, -40%, -60%, -80%, -90%)
+    for (let i = -0.2; i >= -0.9; i -= 0.2) {
+      shades.push(shadeColor(baseHex, i));
+    }
+    return shades;
+  }
+
+  function renderShades() {
+    const shades = generateShades(baseColor);
+    shadesContainer.innerHTML = '';
+    shades.forEach((shade, i) => {
+      const div = document.createElement('div');
+      div.className = 'color-card';
+      div.innerHTML = `
+        <div class="color-box" style="background-color:${shade}"></div>
+        <div class="label">${i < 5 ? Light ${5 - i} : i === 5 ? 'Base' : Dark ${i - 5}}</div>
+        <div class="hex">${shade}</div>
+      `;
+      div.onclick = () => {
+        setBaseColor(shade);
+      };
+      shadesContainer.appendChild(div);
     });
   }
 
-  function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => alert("Copied: " + text));
-  }
+  // Color Harmonies
+  function generateHarmonyColors(baseHex, harmonyType) {
+    const baseHsl = rgbToHsl(...Object.values(hexToRgb(baseHex)));
+    const h = baseHsl.h;
+    const s = baseHsl.s;
+    const l = baseHsl.l;
 
-  function downloadPalette() {
-    const shades = [...shadeContainer.querySelectorAll(".hex")].map(e => e.textContent);
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(shades, null, 2));
-    const dlAnchor = document.createElement("a");
-    dlAnchor.setAttribute("href", dataStr);
-    dlAnchor.setAttribute("download", "palette.json");
-    dlAnchor.click();
-  }
+    let hues = [];
 
-  function toggleDarkMode() {
-    document.body.classList.toggle("dark-mode");
-  }
-
-  function updateGradientPreview() {
-    const start = gradientStart.value;
-    const end = gradientEnd.value;
-    const gradient = `linear-gradient(90deg, ${start}, ${end})`;
-    gradientPreview.style.background = gradient;
-    gradientCSS.innerText = `background: ${gradient};`;
-  }
-
-  function loadPrebuiltPalette(theme) {
-    prebuiltContainer.innerHTML = "";
-    const palettes = {
-      tailwind: ["#0d9488", "#3b82f6", "#6366f1", "#f59e0b", "#ef4444"],
-      material: ["#6200ea", "#03dac5", "#ff0266", "#3700b3", "#018786"],
-      flatui: ["#1abc9c", "#2ecc71", "#3498db", "#e74c3c", "#9b59b6"]
-    };
-    if (palettes[theme]) {
-      palettes[theme].forEach(color => {
-        let card = document.createElement("div");
-        card.className = "color-card";
-        card.innerHTML = `<div class='color-box' style='background:${color}' onclick='copyToClipboard("${color}")'></div><div class='label'>${theme.toUpperCase()}</div><div class='hex'>${color}</div>`;
-        prebuiltContainer.appendChild(card);
-      });
+    switch (harmonyType) {
+      case 'complementary':
+        hues = [h, (h + 180) % 360];
+        break;
+      case 'analogous':
+        hues = [(h + 30) % 360, h, (h + 330) % 360];
+        break;
+      case 'splitComplementary':
+        hues = [(h + 150) % 360, h, (h + 210) % 360];
+        break;
+      case 'triadic':
+        hues = [h, (h + 120) % 360, (h + 240) % 360];
+        break;
+      case 'tetradic':
+        hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
+        break;
+      case 'square':
+        hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
+        break;
+      default:
+        hues = [h];
     }
+
+    return hues.map(hue => rgbToHex(...Object.values(hslToRgb(hue, s, l))));
   }
 
-  function setBaseColor(color) {
-    baseColorInput.value = color;
-    baseColorText.value = color;
-    generateShades(color);
-    checkContrast(color);
-    updateTextPreview(color);
-    generateHarmony(color);
+  function renderHarmony() {
+    const type = harmonyTypeSelect.value;
+    const colors = generateHarmonyColors(baseColor, type);
+    harmonyContainer.innerHTML = '';
+    colors.forEach((color, i) => {
+      const div = document.createElement('div');
+      div.className = 'color-card';
+      div.innerHTML = `
+        <div class="color-box" style="background-color:${color}"></div>
+        <div class="label">${capitalizeFirst(type)} ${i + 1}</div>
+        <div class="hex">${color}</div>
+      `;
+      div.onclick = () => setBaseColor(color);
+      harmonyContainer.appendChild(div);
+    });
   }
 
-  baseColorInput.addEventListener("input", e => setBaseColor(e.target.value));
-  baseColorText.addEventListener("input", e => setBaseColor(e.target.value));
-  gradientStart.addEventListener("input", updateGradientPreview);
-  gradientEnd.addEventListener("input", updateGradientPreview);
-  prebuiltPalettes.addEventListener("change", e => loadPrebuiltPalette(e.target.value));
+  harmonyTypeSelect.addEventListener('change', renderHarmony);
 
-  window.onload = () => {
-    const initial = baseColorInput.value;
-    setBaseColor(initial);
-    updateGradientPreview();
+  // Gradient Generator
+  function createGradientColorInput(value, index) {
+    const input = document.createElement('input');
+    input.type = 'color';
+    input.value = value;
+    input.style.width = '3rem';
+    input.style.height = '2rem';
+    input.style.borderRadius = '6px';
+    input.style.border = '1px solid #ccc';
+    input.title = Gradient color stop ${index + 1};
+    input.addEventListener('input', e => {
+      gradientStops[index] = e.target.value.toUpperCase();
+      updateGradient();
+    });
+    return input;
+  }
+
+  function renderGradientColors() {
+    gradientColorsContainer.innerHTML = '';
+    gradientStops.forEach((color, i) => {
+      gradientColorsContainer.appendChild(createGradientColorInput(color, i));
+    });
+  }
+
+  addGradientColorBtn.addEventListener('click', () => {
+    if (gradientStops.length < 10) {
+      gradientStops.push(baseColor);
+      renderGradientColors();
+      updateGradient();
+    }
+  });
+
+  gradientAngleInput.addEventListener('input', e => {
+    gradientAngle = +e.target.value;
+    angleValueSpan.textContent = gradientAngle;
+    updateGradient();
+  });
+
+  function updateGradient() {
+    const css = linear-gradient(${gradientAngle}deg, ${gradientStops.join(', ')});
+    gradientPreview.style.background = css;
+    gradientCSS.value = background: ${css};;
+  }
+
+  // Color Blindness Simulator
+  // Matrix filters for protanopia, deuteranopia, tritanopia
+  const cbMatrices = {
+    protanopia: [
+      0.567, 0.433, 0, 0, 0,
+      0.558, 0.442, 0, 0, 0,
+      0, 0.242, 0.758, 0, 0,
+      0, 0, 0, 1, 0
+    ],
+    deuteranopia: [
+      0.625, 0.375, 0, 0, 0,
+      0.7, 0.3, 0, 0, 0,
+      0, 0.3, 0.7, 0, 0,
+      0, 0, 0, 1, 0
+    ],
+    tritanopia: [
+      0.95, 0.05, 0, 0, 0,
+      0, 0.433, 0.567, 0, 0,
+      0, 0.475, 0.525, 0, 0,
+      0, 0, 0, 1, 0
+    ],
   };
+
+  function applyColorBlindnessFilter(colors, type) {
+    if (type === 'none') return colors;
+    const matrix = cbMatrices[type];
+    return colors.map(hex => {
+      const { r, g, b } = hexToRgb(hex);
+      const nr = clamp(
+        matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * 255 + matrix[4],
+        0,
+        255
+      );
+      const ng = clamp(
+        matrix[5] * r + matrix[6] * g + matrix[7] * b + matrix[8] * 255 + matrix[9],
+        0,
+        255
+      );
+      const nb = clamp(
+        matrix[10] * r + matrix[11] * g + matrix[12] * b + matrix[13] * 255 + matrix[14],
+        0,
+        255
+      );
+      return rgbToHex(nr, ng, nb);
+    });
+  }
+
+  function renderColorBlindnessPreview() {
+    const type = colorBlindnessTypeSelect.value;
+    const colors = generateShades(baseColor);
+    const filteredColors = applyColorBlindnessFilter(colors, type);
+    cbPalettePreview.innerHTML = '';
+    filteredColors.forEach(color => {
+      const div = document.createElement('div');
+      div.className = 'color-card';
+      div.innerHTML = <div class="color-box" style="background-color:${color}"></div><div class="hex">${color}</div>;
+      cbPalettePreview.appendChild(div);
+    });
+  }
+
+  colorBlindnessTypeSelect.addEventListener('change', renderColorBlindnessPreview);
+
+  // Live Preview Panel - update CSS variables
+  function updateLivePreview() {
+    document.documentElement.style.setProperty('--primary', baseColor);
+    // Adjust secondary and background colors based on base color for contrast
+    const baseRgb = hexToRgb(baseColor);
+    const baseLuminance = (0.299 * baseRgb.r + 0.587 * baseRgb.g + 0.114 * baseRgb.b) / 255;
+    const secondaryColor = baseLuminance > 0.5 ? '#333' : '#ddd';
+    const backgroundColor = baseLuminance > 0.5 ? '#f9f9f9' : '#222';
+    document.documentElement.style.setProperty('--secondary', secondaryColor);
+    document.documentElement.style.setProperty('--background', backgroundColor);
+
+    // Update live preview panel styling
+    livePreviewPanel.style.backgroundColor = 'var(--background)';
+    livePreviewPanel.style.color = 'var(--secondary)';
+  }
+
+  // Typography Pairing Suggestions
+  const fontPairs = {
+    'roboto-merriweather': ['Roboto, sans-serif', 'Merriweather, serif'],
+    'open-sans-lora': ['"Open Sans", sans-serif', 'Lora, serif'],
+    'montserrat-roboto': ['Montserrat, sans-serif', 'Roboto, sans-serif'],
+    'poppins-roboto': ['Poppins, sans-serif', 'Roboto, sans-serif'],
+    'playfair-display-raleway': ['"Playfair Display", serif', 'Raleway, sans-serif'],
+  };
+
+  fontPairSelect.addEventListener('change', () => {
+    const selected = fontPairSelect.value;
+    const [headingFont, bodyFont] = fontPairs[selected];
+    headingSample.style.fontFamily = headingFont;
+    bodySample.style.fontFamily = bodyFont;
+  });
+
+  // Eye Dropper API usage
+  if ('EyeDropper' in window) {
+    eyeDropperBtn.style.display = 'inline-block';
+    eyeDropperBtn.addEventListener('click', async () => {
+      try {
+        const eyeDropper = new EyeDropper();
+        const result = await eyeDropper.open();
+        setBaseColor(result.sRGBHex);
+      } catch (e) {
+        alert('EyeDropper cancelled or not supported.');
+      }
+    });
+  } else {
+    eyeDropperBtn.style.display = 'none';
+  }
+
+  // Update all views when base color changes
+  function updateAll() {
+    renderShades();
+    renderHarmony();
+    renderGradientColors();
+    updateGradient();
+    renderColorBlindnessPreview();
+    updateLivePreview();
+  }
+
+  // Initialize on load
+  setBaseColor(baseColor);
+  updateAll();
+
 </script>
 </body>
 </html>
