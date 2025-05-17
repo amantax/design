@@ -1,749 +1,1067 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aman UI Design Color Panel - Enhanced</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 2rem;
-      color: #333;
-      transition: background 0.3s, color 0.3s;
-    }
-    h1 {
-      text-align: center;
-      color: #222;
-    }
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 2rem 0 1rem;
-      color: #222;
-    }
-    .palette-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-    .color-card {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
-      transition: background-color 0.3s;
-    }
-    .color-card:hover {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    }
-    .color-box {
-      width: 100%;
-      height: 80px;
-      border-radius: 8px;
-      margin-bottom: 0.6rem;
-    }
-    .label {
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: #444;
-    }
-    .hex {
-      font-size: 0.85rem;
-      color: #666;
-      margin-top: 0.3rem;
-      font-family: monospace;
-    }
-    input[type="color"], input[type="text"], select, button {
-      display: block;
-      margin: 0.5rem auto 1rem auto;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 150px;
-      cursor: pointer;
-      transition: border-color 0.3s;
-    }
-    input[type="text"] {
-      width: 120px;
-      text-transform: uppercase;
-      font-family: monospace;
-    }
-    input[type="text"]:focus, input[type="color"]:focus, select:focus {
-      border-color: #007BFF;
-      outline: none;
-    }
-    .preview-box {
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      text-align: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      user-select: none;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .export-btn {
-      margin-top: 2rem;
-      padding: 0.6rem 1.2rem;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 1rem;
-      transition: background-color 0.3s;
-    }
-    .export-btn:hover {
-      background: #0056b3;
-    }
-    .dark-mode-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      padding: 0.5rem 1rem;
-      background: #333;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-      z-index: 1000;
-    }
-    body.dark-mode {
-      background: #121212;
-      color: #f5f5f5;
-    }
-    body.dark-mode .color-card {
-      background: #1e1e1e;
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
-    }
-    body.dark-mode input, body.dark-mode select {
-      background: #333;
-      color: #f5f5f5;
-      border-color: #555;
-    }
-    body.dark-mode .export-btn {
-      background: #0a84ff;
-    }
-    /* Flex layout for sections needing horizontal controls */
-    .flex-row {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
-    /* HSL sliders */
-    .hsl-slider {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      max-width: 300px;
-      margin: 0.3rem auto;
-    }
-    .hsl-slider label {
-      width: 40px;
-      font-weight: 600;
-    }
-    .hsl-slider input[type="range"] {
-      flex-grow: 1;
-      cursor: pointer;
-    }
-    /* Color blindness simulator preview */
-    .cb-preview {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .cb-preview .color-card {
-      width: 140px;
-      user-select: none;
-    }
-    /* Live UI preview */
-    #livePreviewPanel {
-      max-width: 600px;
-      margin: 1rem auto;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-      background: #fff;
-      color: #000;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark-mode #livePreviewPanel {
-      background: #1e1e1e;
-      color: #f5f5f5;
-    }
-    #livePreviewPanel button {
-      background-color: var(--primary, #007bff);
-      color: var(--primary-text, #fff);
-      border: none;
-      padding: 0.5rem 1rem;
-      margin: 0.3rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.3s;
-    }
-    #livePreviewPanel button:hover {
-      background-color: var(--primary-hover, #0056b3);
-    }
-    #livePreviewPanel .card {
-      border: 1px solid var(--primary, #007bff);
-      padding: 1rem;
-      border-radius: 10px;
-      margin: 1rem 0;
-      background-color: var(--card-bg, #e0e7ff);
-      color: var(--card-text, #000);
-      transition: background-color 0.3s, color 0.3s;
-    }
-    /* Typography pairing */
-    #typographyPairing {
-      max-width: 600px;
-      margin: 1rem auto;
-      text-align: center;
-    }
-    #typographyPairing h3 {
-      margin-bottom: 0.3rem;
-    }
-    #typographyPairing p {
-      font-size: 1.1rem;
-      margin-top: 0;
-      margin-bottom: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aman UI Design Color Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* bg-gray-100 */
+            margin: 0;
+            padding: 0;
+            color: #1f2937; /* text-gray-800 */
+        }
+        .container {
+            max-width: 1000px; /* Increased max-width */
+            margin: 2rem auto; /* mt-8, mb-8 */
+            padding: 2rem;    /* px-4 py-8 */
+            background-color: #fff; /* bg-white */
+            border-radius: 0.75rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.25rem; /* text-3xl */
+            font-weight: 700;  /* font-bold */
+            color: #4f46e5;    /* text-indigo-600 */
+            margin-bottom: 1.5rem; /* mb-6 */
+        }
+        .section-title {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600;  /* font-semibold */
+            margin: 2rem 0 1.5rem; /* mt-8 mb-6 */
+            color: #1e293b;  /* text-gray-900 */
+            border-bottom: 2px solid #e5e7eb; /* border-b border-gray-200 */
+            padding-bottom: 0.75rem; /* pb-3 */
+        }
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;      /* gap-6 */
+        }
+
+        .color-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;    /* gap-2 */
+        }
+        .color-input-group label{
+            font-weight: 500;
+            color: #374151;
+        }
+        input[type="color"] {
+            width: 3rem;       /* w-12 */
+            height: 3rem;      /* h-12 */
+            border: none;
+            border-radius: 0.5rem;  /* rounded-md */
+            cursor: pointer;
+            -webkit-appearance: none;  /* Remove default color picker appearance */
+            -moz-appearance: none;
+            appearance: none;
+        }
+        input[type="color"]::-webkit-color-swatch {
+            border-radius: 0.5rem; /* rounded-md */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        input[type="color"]::-moz-color-swatch {
+            border-radius: 0.5rem; /* rounded-md */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+
+        input[type="text"] {
+            width: 8rem;       /* w-32 */
+            padding: 0.75rem;    /* py-3 px-4 */
+            border-radius: 0.375rem;  /* rounded-md */
+            border: 1px solid #d1d5db;  /* border-gray-300 */
+            font-size: 0.875rem;  /* text-sm */
+            color: #4b5563;    /* text-gray-600 */
+            text-align: center;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #6366f1;  /* focus:border-indigo-500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16); /* focus:ring-indigo-500 focus:ring-opacity-20 */
+        }
+        .hsl-slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;      /* gap-6 */
+            max-width: 320px;
+            margin: auto;
+        }
+        .hsl-slider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;        /* gap-4 */
+        }
+        .hsl-slider label {
+            width: 4rem;       /* w-16 */
+            font-weight: 500;  /* font-medium */
+            color: #4b5563;    /* text-gray-600 */
+            font-size: 0.875rem;
+        }
+        .hsl-slider input[type="range"] {
+            flex: 1;
+            height: 0.5rem;    /* h-2 */
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 0.5rem;  /* rounded-full */
+            background: #e5e7eb;  /* bg-gray-200 */
+        }
+        .hsl-slider input[type="range"]:focus {
+            outline: none;
+        }
+        .hsl-slider input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 1.25rem;     /* w-5 */
+            height: 1.25rem;    /* h-5 */
+            background: #6366f1;  /* bg-indigo-500 */
+            border-radius: 50%;
+            border: 2px solid #fff; /* border-white */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);  /* shadow-sm */
+        }
+        .hsl-slider input[type="range"]::-moz-range-thumb {
+            width: 1.25rem;     /* w-5 */
+            height: 1.25rem;    /* h-5 */
+            background: #6366f1;  /* bg-indigo-500 */
+            border-radius: 50%;
+            border: 2px solid #fff; /* border-white */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);  /* shadow-sm */
+            border: none;
+        }
+        .hsl-slider input[type="range"]::-webkit-slider-thumb:hover,
+        .hsl-slider input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+        }
+        #eyeDropperBtn {
+            padding: 0.75rem 1rem;    /* py-3 px-4 */
+            border-radius: 0.375rem;  /* rounded-md */
+            background-color: #fff; /* bg-white */
+            color: #4b5563;       /* text-gray-600 */
+            border: 1px solid #d1d5db;  /* border-gray-300 */
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);  /* shadow-sm */
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #eyeDropperBtn:hover {
+            background-color: #f9fafb;  /* hover:bg-gray-50 */
+            border-color: #9ca3af;
+        }
+        .palette-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;      /* gap-6 */
+        }
+        .color-card {
+            padding: 1.25rem;    /* py-5 px-4 */
+            border-radius: 0.5rem;  /* rounded-md */
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);  /* shadow-sm */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            background-color: #fff;
+            border: 1px solid #e5e7eb;
+        }
+        .color-card:hover {
+            transform: translateY(-0.5rem);
+            box-shadow: 0 6px 8px -2px rgba(0, 0, 0, 0.15), 0 3px 7px -3px rgba(0, 0, 0, 0.07);
+        }
+        .color-box {
+            width: 100%;
+            height: 4rem;       /* h-16 */
+            border-radius: 0.375rem;  /* rounded-md */
+            margin-bottom: 0.75rem;  /* mb-3 */
+            border: 1px solid #f9fafb;
+        }
+        .label {
+            font-size: 0.875rem;  /* text-sm */
+            font-weight: 600;  /* font-semibold */
+            color: #374151;    /* text-gray-700 */
+        }
+        .hex {
+            font-size: 0.75rem;  /* text-xs */
+            color: #6b7280;    /* text-gray-500 */
+            margin-top: 0.25rem;  /* mt-1 */
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        #gradientColorsContainer {
+            display: flex;
+            gap: 1rem;        /* gap-4 */
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 1.5rem;    /* mb-6 */
+        }
+        #gradientColorsContainer input[type="color"]{
+             width: 3rem;       /* w-12 */
+            height: 3rem;      /* h-12 */
+            border-radius: 0.5rem;  /* rounded-md */
+            cursor: pointer;
+            -webkit-appearance: none;  /* Remove default color picker appearance */
+            -moz-appearance: none;
+            appearance: none;
+            border: none;
+        }
+         #gradientColorsContainer input[type="color"]::-webkit-color-swatch {
+            border-radius: 0.5rem; /* rounded-md */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        #gradientColorsContainer input[type="color"]::-moz-color-swatch {
+            border-radius: 0.5rem; /* rounded-md */
+             border: 1px solid #e5e7eb; /* border-gray-200 */
+        }
+        #addGradientColorBtn {
+            padding: 0.75rem 1.5rem;    /* py-3 px-6 */
+            border-radius: 0.375rem;  /* rounded-md */
+            background-color: #6366f1;  /* bg-indigo-500 */
+            color: #fff;
+            font-weight: 600;  /* font-semibold */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);  /* shadow-sm */
+        }
+        #addGradientColorBtn:hover {
+            background-color: #4f46e5;  /* hover:bg-indigo-600 */
+        }
+        .gradient-angle-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;    /* gap-2 */
+            margin-top: 1rem;
+        }
+
+        .gradient-angle-group label {
+            font-size: 0.875rem;  /* text-sm */
+            font-weight: 500;  /* font-medium */
+            color: #4b5563;    /* text-gray-600 */
+        }
+        #gradientAngle {
+            width: 100%;
+            max-width: 320px;
+            margin: auto;
+        }
+
+        #angleValueSpan {
+            font-size: 0.875rem;  /* text-sm */
+            color: #6b7280;    /* text-gray-500 */
+        }
+        #gradientPreview {
+            height: 6rem;       /* h-24 */
+            margin-top: 1rem;    /* mt-4 */
+            border-radius: 0.5rem;  /* rounded-md */
+            border: 2px solid #e5e7eb;  /* border-gray-200 */
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);  /* shadow-sm */
+        }
+        #gradientCSS {
+            width: 100%;
+            margin-top: 0.5rem;  /* mt-2 */
+            padding: 0.75rem;    /* py-3 px-4 */
+            border-radius: 0.375rem;  /* rounded-md */
+            border: 1px solid #d1d5db;  /* border-gray-300 */
+            font-size: 0.875rem;  /* text-sm */
+            color: #4b5563;    /* text-gray-600 */
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            resize: none;
+            height: auto;
+            min-height: 2.75rem;
+        }
+        #colorBlindnessType {
+            padding: 0.75rem 1rem;    /* py-3 px-4 */
+            border-radius: 0.375rem;  /* rounded-md */
+            border: 1px solid #d1d5db;  /* border-gray-300 */
+            font-size: 0.875rem;  /* text-sm */
+            color: #4b5563;    /* text-gray-600 */
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        #colorBlindnessType:focus {
+            outline: none;
+            border-color: #6366f1;  /* focus:border-indigo-500 */
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16); /* focus:ring-indigo-500 focus:ring-opacity-20 */
+        }
+        .cb-preview {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;      /* gap-6 */
+        }
+        .cb-preview .color-card {
+            width: 10rem;      /* w-40 */
+        }
+        #livePreviewPanel {
+            padding: 1.5rem;    /* py-6 px-8 */
+            border-radius: 0.5rem;  /* rounded-md */
+            margin: 2rem auto;    /* mt-8 mb-8 */
+            background-color: #f9fafb;  /* bg-gray-50 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            max-width: 600px;
+            border: 1px solid #e5e7eb;
+        }
+        #livePreviewPanel h2 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600;  /* font-semibold */
+            margin-bottom: 1rem;  /* mb-4 */
+            color: #1e293b;
+        }
+        #livePreviewPanel button {
+            padding: 0.75rem 1.5rem;    /* py-3 px-6 */
+            border-radius: 0.375rem;  /* rounded-md */
+            background-color: #6366f1;  /* bg-indigo-500 */
+            color: #fff;
+            font-weight: 600;  /* font-semibold */
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);  /* shadow-sm */
+            margin: 0.5rem;
+        }
+        #livePreviewPanel button:hover {
+            background-color: #4f46e5;  /* hover:bg-indigo-600 */
+        }
+        #livePreviewPanel button:disabled {
+            background-color: #d1d5db;  /* bg-gray-300 */
+            cursor: not-allowed;
+            opacity: 0.7;
+            box-shadow: none;
+        }
+        #livePreviewPanel .card {
+            padding: 1.5rem;    /* py-6 px-8 */
+            border-radius: 0.5rem;  /* rounded-md */
+            border: 1px solid #e5e7eb;  /* border-gray-200 */
+            margin: 1rem 0;    /* mt-4 mb-4 */
+            background-color: #f7fafc;
+        }
+        #livePreviewPanel .card h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600;  /* font-semibold */
+            margin-bottom: 0.75rem;  /* mb-3 */
+            color: #1e293b;
+        }
+        #livePreviewPanel .card p {
+            font-size: 1rem;
+            color: #4b5563;
+        }
+        #livePreviewPanel input[type="text"] {
+            width: calc(100% - 2rem);
+            padding: 0.75rem;    /* py-3 px-4 */
+            border-radius: 0.375rem;  /* rounded-md */
+            border: 1px solid #d1d5db;  /* border-gray-300 */
+            font-size: 0.875rem;  /* text-sm */
+            color: #4b5563;
+            margin: 0.5rem 0;
+        }
+         #livePreviewPanel input[type="text"]:disabled{
+            background-color: #edf2f7;
+            cursor: not-allowed;
+        }
+
+        #typographyPairing {
+            text-align: center;
+            margin: 2rem auto;
+            max-width: 600px;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #f7fafc;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        #typographyPairing label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-right: 0.5rem;
+        }
+
+        #fontPairSelect {
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            font-size: 0.875rem;
+            color: #4b5563;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            margin-bottom: 1.5rem;
+            width: 250px;
+        }
+
+        #fontPairSelect:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+        }
+
+        #typographyPairing h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        #typographyPairing p {
+            font-size: 1.1rem;
+            color: #4b5563;
+            font-family: 'Merriweather', serif;
+            line-height: 1.75;
+        }
+        .dark-mode-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #374151;
+            color: #fff;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            z-index: 1000;
+            border: none;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #1f2937;
+        }
+
+        body.dark-mode {
+            background-color: #111827;
+            color: #f9fafb;
+        }
+        body.dark-mode .container{
+            background-color: #1f2937;
+             box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255,255,255,0.06);
+        }
+        body.dark-mode h1,
+        body.dark-mode .section-title{
+            color:#fff;
+            border-bottom-color: #4b5563;
+        }
+        body.dark-mode .color-card{
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        body.dark-mode .label,
+        body.dark-mode .hsl-slider label,
+        body.dark-mode #livePreviewPanel h2,
+        body.dark-mode #livePreviewPanel .card h3{
+            color: #f9fafb;
+        }
+        body.dark-mode .hex,
+        body.dark-mode .gradient-angle-group label,
+        body.dark-mode #angleValueSpan,
+        body.dark-mode #livePreviewPanel p{
+            color: #d1d5db;
+        }
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea{
+            background-color: #4b5563;
+            border-color: #6b7280;
+            color: #fff;
+        }
+        body.dark-mode input:focus,
+        body.dark-mode select:focus,
+        body.dark-mode textarea:focus{
+             border-color: #a855f7;  /* focus:border-purple-500 */
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.16); /* focus:ring-purple-500 focus:ring-opacity-20 */
+        }
+        body.dark-mode #eyeDropperBtn{
+            background-color: #4b5563;
+            color: #fff;
+            border-color: #6b7280;
+        }
+        body.dark-mode #eyeDropperBtn:hover{
+            background-color: #6b7280;
+            border-color: #9ca3af;
+        }
+
+        body.dark-mode #addGradientColorBtn{
+            background-color: #a855f7;
+        }
+        body.dark-mode #addGradientColorBtn:hover{
+            background-color: #9333ea;
+        }
+        body.dark-mode #livePreviewPanel{
+            background-color: #242424;
+            border-color: #4b5563;
+        }
+        body.dark-mode #livePreviewPanel button{
+            background-color: #a855f7;
+        }
+        body.dark-mode #livePreviewPanel button:hover{
+             background-color: #9333ea;
+        }
+         body.dark-mode #livePreviewPanel button:disabled{
+            background-color: #6b7280;
+        }
+        body.dark-mode #livePreviewPanel .card{
+            background-color: #374151;
+            border-color: #4b5563;
+        }
+        body.dark-mode #typographyPairing{
+            background-color: #242424;
+            border-color: #4b5563;
+        }
+    </style>
 </head>
 <body>
 
-<button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
-<h1>Aman UI Design Color Panel - Enhanced</h1>
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <div class="container">
+        <h1>Aman UI Design Color Panel</h1>
 
-<!-- 1. Select or Paste a Base Color -->
-<div class="section-title">1. Select or Paste a Base Color</div>
-<div class="flex-row" style="justify-content:center; gap: 1rem;">
-  <input type="color" id="baseColor" value="#7ea8d2" title="Pick base color"/>
-  <input type="text" id="baseColorText" placeholder="#7EA8D2" maxlength="7" />
-</div>
+        <div class="section-title">1. Select or Paste a Base Color</div>
+        <div class="flex-row">
+            <div class="color-input-group">
+                <label for="baseColor">Color</label>
+                <input type="color" id="baseColor" value="#7ea8d2" title="Pick base color"/>
+            </div>
+            <div class="color-input-group">
+                 <label for="baseColorText">Hex Code</label>
+                <input type="text" id="baseColorText" placeholder="#7EA8D2" maxlength="7" />
+            </div>
+        </div>
 
-<!-- 11. Interactive Color Picker -->
-<div class="section-title">2. Interactive HSL Color Picker</div>
-<div id="hslPicker" style="max-width:320px; margin:auto;">
-  <div class="hsl-slider">
-    <label for="hueRange">Hue</label>
-    <input type="range" id="hueRange" min="0" max="360" />
-  </div>
-  <div class="hsl-slider">
-    <label for="satRange">Sat</label>
-    <input type="range" id="satRange" min="0" max="100" />
-  </div>
-  <div class="hsl-slider">
-    <label for="lightRange">Light</label>
-    <input type="range" id="lightRange" min="0" max="100" />
-  </div>
-  <button id="eyeDropperBtn" title="Pick color from screen">🎨 Use Eyedropper</button>
-</div>
+        <div class="section-title">2. Interactive HSL Color Picker</div>
+        <div class="hsl-slider-group">
+            <div class="hsl-slider">
+                <label for="hueRange">Hue</label>
+                <input type="range" id="hueRange" min="0" max="360" />
+            </div>
+            <div class="hsl-slider">
+                <label for="satRange">Saturation</label>
+                <input type="range" id="satRange" min="0" max="100" />
+            </div>
+            <div class="hsl-slider">
+                <label for="lightRange">Lightness</label>
+                <input type="range" id="lightRange" min="0" max="100" />
+            </div>
+            <button id="eyeDropperBtn" title="Pick color from screen">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-dropper-2"><path d="M12.11 18.57a8 8 0 1 0-5.66-5.66"></path><path d="M18 8a6 6 0 0 1-2.3-4.85 4 4 0 0 0-6.81-1.74 6 6 0 0 1-1.74 6.81 4 4 0 0 0 4.85 2.3"></path><path d="M18 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path></svg>
+                Eyedropper
+            </button>
+        </div>
 
-<!-- 2. Color Shades (Light + Dark) -->
-<div class="section-title">3. Generated Color Shades</div>
-<div class="palette-container" id="shadesContainer"></div>
+        <div class="section-title">3. Generated Color Shades</div>
+        <div class="palette-container" id="shadesContainer"></div>
 
-<!-- 5. More Color Harmonies -->
-<div class="section-title">4. Color Harmonies</div>
-<div style="text-align:center;">
-  <select id="harmonyType">
-    <option value="complementary">Complementary</option>
-    <option value="analogous">Analogous</option>
-    <option value="splitComplementary">Split Complementary</option>
-    <option value="triadic">Triadic</option>
-    <option value="tetradic">Tetradic</option>
-    <option value="square">Square</option>
-  </select>
-</div>
-<div class="palette-container" id="harmonyContainer"></div>
+        <div class="section-title">4. Color Harmonies</div>
+        <div style="text-align:center;">
+            <select id="harmonyType">
+                <option value="complementary">Complementary</option>
+                <option value="analogous">Analogous</option>
+                <option value="splitComplementary">Split Complementary</option>
+                <option value="triadic">Triadic</option>
+                <option value="tetradic">Tetradic</option>
+                <option value="square">Square</option>
+            </select>
+        </div>
+        <div class="palette-container" id="harmonyContainer"></div>
 
-<!-- 4. Custom Gradient Generator -->
-<div class="section-title">5. Custom Gradient Generator</div>
-<div style="max-width: 480px; margin: auto;">
-  <div id="gradientColorsContainer" style="display:flex; gap:1rem; flex-wrap:wrap; justify-content:center;"></div>
-  <button id="addGradientColorBtn" style="margin-bottom: 1rem;">+ Add Color Stop</button>
-  <label for="gradientAngle">Gradient Angle: <span id="angleValue">90</span>°</label>
-  <input type="range" id="gradientAngle" min="0" max="360" value="90" />
-  <div id="gradientPreview" class="preview-box" style="height: 100px; margin-top:1rem; border: 2px solid #ccc; border-radius: 12px;"></div>
-  <textarea id="gradientCSS" rows="2" style="width:100%; margin-top: 0.5rem;" readonly></textarea>
-</div>
+        <div class="section-title">5. Custom Gradient Generator</div>
+        <div>
+            <div id="gradientColorsContainer"></div>
+            <button id="addGradientColorBtn">+ Add Color Stop</button>
+            <div class="gradient-angle-group">
+                <label for="gradientAngle">Gradient Angle: <span id="angleValueSpan">90</span>°</label>
+                <input type="range" id="gradientAngle" min="0" max="360" value="90" />
+            </div>
+            <div id="gradientPreview"></div>
+            <textarea id="gradientCSS" rows="2" readonly></textarea>
+        </div>
 
-<!-- 3. Color Blindness Simulator -->
-<div class="section-title">6. Color Blindness Simulator</div>
-<div style="text-align:center; margin-bottom:1rem;">
-  <select id="colorBlindnessType">
-    <option value="none">None (Normal)</option>
-    <option value="protanopia">Protanopia</option>
-    <option value="deuteranopia">Deuteranopia</option>
-    <option value="tritanopia">Tritanopia</option>
-  </select>
-</div>
-<div class="cb-preview" id="cbPalettePreview"></div>
+        <div class="section-title">6. Color Blindness Simulator</div>
+        <div style="text-align:center;">
+            <select id="colorBlindnessType">
+                <option value="none">None (Normal)</option>
+                <option value="protanopia">Protanopia</option>
+                <option value="deuteranopia">Deuteranopia</option>
+                <option value="tritanopia">Tritanopia</option>
+            </select>
+        </div>
+        <div class="cb-preview" id="cbPalettePreview"></div>
 
-<!-- 7. Live Preview of UI Components -->
-<div class="section-title">7. Live Preview of UI Components</div>
-<div id="livePreviewPanel">
-  <h2>Preview Panel</h2>
-  <button>Primary Button</button>
-  <button disabled>Disabled Button</button>
-  <div class="card">
-    <h3>Card Title</h3>
-    <p>This is a card example styled with your palette.</p>
-  </div>
-  <input type="text" placeholder="Input field" disabled style="padding:0.5rem; border-radius:6px; border:1px solid var(--primary);" />
-</div>
+        <div class="section-title">7. Live Preview of UI Components</div>
+        <div id="livePreviewPanel">
+            <h2>Preview Panel</h2>
+            <button>Primary Button</button>
+            <button disabled>Disabled Button</button>
+            <div class="card">
+                <h3>Card Title</h3>
+                <p>This is a card example styled with your palette.</p>
+            </div>
+            <input type="text" placeholder="Input field" disabled />
+        </div>
 
-<!-- 9. Typography Pairing Suggestions -->
-<div class="section-title">8. Typography Pairing Suggestions</div>
-<div id="typographyPairing">
-  <label for="fontPairSelect">Select Font Pair:</label>
-  <select id="fontPairSelect" style="margin-left: 0.5rem; padding: 0.3rem 0.5rem;">
-    <option value="roboto-merriweather">Roboto & Merriweather</option>
-    <option value="open-sans-lora">Open Sans & Lora</option>
-    <option value="montserrat-roboto">Montserrat & Roboto</option>
-    <option value="poppins-roboto">Poppins & Roboto</option>
-    <option value="playfair-display-raleway">Playfair Display & Raleway</option>
-  </select>
-  <h3 id="headingSample" style="font-family: Roboto, sans-serif;">Heading Sample Text</h3>
-  <p id="bodySample" style="font-family: Merriweather, serif;">Body sample text to demonstrate font pairing.</p>
-</div>
+        <div class="section-title">8. Typography Pairing Suggestions</div>
+        <div id="typographyPairing">
+            <label for="fontPairSelect">Select Font Pair:</label>
+            <select id="fontPairSelect">
+                <option value="roboto-merriweather">Roboto & Merriweather</option>
+                <option value="open-sans-lora">Open Sans & Lora</option>
+                <option value="montserrat-roboto">Montserrat & Roboto</option>
+                <option value="poppins-roboto">Poppins & Roboto</option>
+                <option value="playfair-display-raleway">Playfair Display & Raleway</option>
+            </select>
+            <h3 id="headingSample">Heading Sample Text</h3>
+            <p id="bodySample">Body sample text to demonstrate font pairing.</p>
+        </div>
+    </div>
 
-<script>
-  // Utility functions
-  function clamp(num, min, max) {
-    return Math.min(Math.max(num, min), max);
-  }
-  function rgbToHex(r, g, b) {
-    return (
-      '#' +
-      [r, g, b]
-        .map(x => {
-          const hex = x.toString(16);
-          return hex.length === 1 ? '0' + hex : hex;
-        })
-        .join('')
-        .toUpperCase()
-    );
-  }
-  function hexToRgb(hex) {
-    let cleanHex = hex.replace('#', '');
-    if (cleanHex.length === 3) {
-      cleanHex = cleanHex.split('').map(x => x + x).join('');
-    }
-    const bigint = parseInt(cleanHex, 16);
-    return {
-      r: (bigint >> 16) & 255,
-      g: (bigint >> 8) & 255,
-      b: bigint & 255,
-    };
-  }
-  function rgbToHsl(r, g, b) {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b),
-      min = Math.min(r, g, b);
-    let h,
-      s,
-      l = (max + min) / 2;
-    if (max === min) {
-      h = s = 0; // achromatic
-    } else {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-    return { h: h * 360, s: s * 100, l: l * 100 };
-  }
-  function hslToRgb(h, s, l) {
-    h /= 360;
-    s /= 100;
-    l /= 100;
-    let r, g, b;
-    if (s === 0) {
-      r = g = b = l; // achromatic
-    } else {
-      function hue2rgb(p, q, t) {
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-        if (t < 1 / 6) return p + (q - p) * 6 * t;
-        if (t < 1 / 2) return q;
-        if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-        return p;
-      }
-      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-      const p = 2 * l - q;
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
-    }
-    return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
-  }
-  function shadeColor(hex, percent) {
-    const { r, g, b } = hexToRgb(hex);
-    const t = percent < 0 ? 0 : 255;
-    const p = Math.abs(percent);
-    const R = Math.round((t - r) * p) + r;
-    const G = Math.round((t - g) * p) + g;
-    const B = Math.round((t - b) * p) + b;
-    return rgbToHex(R, G, B);
-  }
-  function capitalizeFirst(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
+    <script>
+        // Utility functions
+        function clamp(num, min, max) {
+            return Math.min(Math.max(num, min), max);
+        }
+        function rgbToHex(r, g, b) {
+            return (
+                '#' +
+                [r, g, b]
+                    .map(x => {
+                        const hex = x.toString(16);
+                        return hex.length === 1 ? '0' + hex : hex;
+                    })
+                    .join('')
+                    .toUpperCase()
+            );
+        }
+        function hexToRgb(hex) {
+            let cleanHex = hex.replace('#', '');
+            if (cleanHex.length === 3) {
+                cleanHex = cleanHex.split('').map(x => x + x).join('');
+            }
+            const bigint = parseInt(cleanHex, 16);
+            return {
+                r: (bigint >> 16) & 255,
+                g: (bigint >> 8) & 255,
+                b: bigint & 255,
+            };
+        }
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            const max = Math.max(r, g, b),
+                min = Math.min(r, g, b);
+            let h,
+                s,
+                l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r:
+                        h = (g - b) / d + (g < b ? 6 : 0);
+                        break;
+                    case g:
+                        h = (b - r) / d + 2;
+                        break;
+                    case b:
+                        h = (r - g) / d + 4;
+                        break;
+                }
+                h /= 6;
+            }
+            return { h: h * 360, s: s * 100, l: l * 100 };
+        }
+        function hslToRgb(h, s, l) {
+            h /= 360;
+            s /= 100;
+            l /= 100;
+            let r, g, b;
+            if (s === 0) {
+                r = g = b = l; // achromatic
+            } else {
+                function hue2rgb(p, q, t) {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1 / 6) return p + (q - p) * 6 * t;
+                    if (t < 1 / 2) return q;
+                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                    return p;
+                }
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1 / 3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1 / 3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        }
+        function shadeColor(hex, percent) {
+            const { r, g, b } = hexToRgb(hex);
+            const t = percent < 0 ? 0 : 255;
+            const p = Math.abs(percent);
+            const R = Math.round((t - r) * p) + r;
+            const G = Math.round((t - g) * p) + g;
+            const B = Math.round((t - b) * p) + b;
+            return rgbToHex(R, G, B);
+        }
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
 
-  // Global state
-  let baseColor = '#7EA8D2';
-  let hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
-  let gradientStops = [baseColor, shadeColor(baseColor, -0.3)];
-  let gradientAngle = 90;
+        // Global state
+        let baseColor = '#7EA8D2';
+        let hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
+        let gradientStops = [baseColor, shadeColor(baseColor, -0.3)];
+        let gradientAngle = 90;
+        let darkMode = false;
 
-  // DOM Elements
-  const baseColorInput = document.getElementById('baseColor');
-  const baseColorTextInput = document.getElementById('baseColorText');
-  const shadesContainer = document.getElementById('shadesContainer');
-  const harmonyContainer = document.getElementById('harmonyContainer');
-  const harmonyTypeSelect = document.getElementById('harmonyType');
-  const gradientColorsContainer = document.getElementById('gradientColorsContainer');
-  const addGradientColorBtn = document.getElementById('addGradientColorBtn');
-  const gradientAngleInput = document.getElementById('gradientAngle');
-  const angleValueSpan = document.getElementById('angleValue');
-  const gradientPreview = document.getElementById('gradientPreview');
-  const gradientCSS = document.getElementById('gradientCSS');
-  const colorBlindnessTypeSelect = document.getElementById('colorBlindnessType');
-  const cbPalettePreview = document.getElementById('cbPalettePreview');
-  const livePreviewPanel = document.getElementById('livePreviewPanel');
-  const fontPairSelect = document.getElementById('fontPairSelect');
-  const headingSample = document.getElementById('headingSample');
-  const bodySample = document.getElementById('bodySample');
-  // HSL Pickers
-  const hueRange = document.getElementById('hueRange');
-  const satRange = document.getElementById('satRange');
-  const lightRange = document.getElementById('lightRange');
-  const eyeDropperBtn = document.getElementById('eyeDropperBtn');
+        // DOM Elements
+        const body = document.body;
+        const baseColorInput = document.getElementById('baseColor');
+        const baseColorTextInput = document.getElementById('baseColorText');
+        const shadesContainer = document.getElementById('shadesContainer');
+        const harmonyContainer = document.getElementById('harmonyContainer');
+        const harmonyTypeSelect = document.getElementById('harmonyType');
+        const gradientColorsContainer = document.getElementById('gradientColorsContainer');
+        const addGradientColorBtn = document.getElementById('addGradientColorBtn');
+        const gradientAngleInput = document.getElementById('gradientAngle');
+        const angleValueSpan = document.getElementById('angleValueSpan');
+        const gradientPreview = document.getElementById('gradientPreview');
+        const gradientCSS = document.getElementById('gradientCSS');
+        const colorBlindnessTypeSelect = document.getElementById('colorBlindnessType');
+        const cbPalettePreview = document.getElementById('cbPalettePreview');
+        const livePreviewPanel = document.getElementById('livePreviewPanel');
+        const fontPairSelect = document.getElementById('fontPairSelect');
+        const headingSample = document.getElementById('headingSample');
+        const bodySample = document.getElementById('bodySample');
+        // HSL Pickers
+        const hueRange = document.getElementById('hueRange');
+        const satRange = document.getElementById('satRange');
+        const lightRange = document.getElementById('lightRange');
+        const eyeDropperBtn = document.getElementById('eyeDropperBtn');
+        const darkModeToggle = document.querySelector('.dark-mode-toggle');
 
-  // Synchronize base color inputs
-  function setBaseColor(newColor) {
-    baseColor = newColor.toUpperCase();
-    baseColorInput.value = baseColor;
-    baseColorTextInput.value = baseColor;
-    hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
-    updateHslSliders();
-    updateAll();
-  }
+        // Synchronize base color inputs
+        function setBaseColor(newColor) {
+            baseColor = newColor.toUpperCase();
+            baseColorInput.value = baseColor;
+            baseColorTextInput.value = baseColor;
+            hsl = rgbToHsl(...Object.values(hexToRgb(baseColor)));
+            updateHslSliders();
+            updateAll();
+        }
 
-  function updateHslSliders() {
-    hueRange.value = Math.round(hsl.h);
-    satRange.value = Math.round(hsl.s);
-    lightRange.value = Math.round(hsl.l);
-  }
+        function updateHslSliders() {
+            hueRange.value = Math.round(hsl.h);
+            satRange.value = Math.round(hsl.s);
+            lightRange.value = Math.round(hsl.l);
+        }
 
-  baseColorInput.addEventListener('input', e => {
-    const val = e.target.value;
-    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-      setBaseColor(val);
-    }
-  });
-  baseColorTextInput.addEventListener('input', e => {
-    const val = e.target.value.trim();
-    if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-      setBaseColor(val);
-    }
-  });
+        baseColorInput.addEventListener('input', e => {
+            const val = e.target.value;
+            if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                setBaseColor(val);
+            }
+        });
+        baseColorTextInput.addEventListener('input', e => {
+            const val = e.target.value.trim();
+            if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                setBaseColor(val);
+            }
+        });
 
-  // HSL slider event handlers
-  function updateBaseColorFromHsl() {
-    const h = clamp(+hueRange.value, 0, 360);
-    const s = clamp(+satRange.value, 0, 100);
-    const l = clamp(+lightRange.value, 0, 100);
-    hsl = { h, s, l };
-    const { r, g, b } = hslToRgb(h, s, l);
-    setBaseColor(rgbToHex(r, g, b));
-  }
-  hueRange.addEventListener('input', updateBaseColorFromHsl);
-  satRange.addEventListener('input', updateBaseColorFromHsl);
-  lightRange.addEventListener('input', updateBaseColorFromHsl);
+        // HSL slider event handlers
+        function updateBaseColorFromHsl() {
+            const h = clamp(+hueRange.value, 0, 360);
+            const s = clamp(+satRange.value, 0, 100);
+            const l = clamp(+lightRange.value, 0, 100);
+            hsl = { h, s, l };
+            const { r, g, b } = hslToRgb(h, s, l);
+            setBaseColor(rgbToHex(r, g, b));
+        }
+        hueRange.addEventListener('input', updateBaseColorFromHsl);
+        satRange.addEventListener('input', updateBaseColorFromHsl);
+        lightRange.addEventListener('input', updateBaseColorFromHsl);
 
-  // Generate color shades (+ and -)
-  function generateShades(baseHex) {
-    const shades = [];
-    // 5 lighter shades (20%, 40%, 60%, 80%, 90%)
-    for (let i = 0.9; i >= 0.3; i -= 0.2) {
-      shades.push(shadeColor(baseHex, i));
-    }
-    // Base color in center
-    shades.push(baseHex);
-    // 5 darker shades (-20%, -40%, -60%, -80%, -90%)
-    for (let i = -0.2; i >= -0.9; i -= 0.2) {
-      shades.push(shadeColor(baseHex, i));
-    }
-    return shades;
-  }
+        // Generate color shades (+ and -)
+        function generateShades(baseHex) {
+            const shades = [];
+            // 5 lighter shades (20%, 40%, 60%, 80%, 90%)
+            for (let i = 0.9; i >= 0.3; i -= 0.2) {
+                shades.push(shadeColor(baseHex, i));
+            }
+            // Base color in center
+            shades.push(baseHex);
+            // 5 darker shades (-20%, -40%, -60%, -80%, -90%)
+            for (let i = -0.2; i >= -0.9; i -= 0.2) {
+                shades.push(shadeColor(baseHex, i));
+            }
+            return shades;
+        }
 
-  function renderShades() {
-    const shades = generateShades(baseColor);
-    shadesContainer.innerHTML = '';
-    shades.forEach((shade, i) => {
-      const div = document.createElement('div');
-      div.className = 'color-card';
-      div.innerHTML = `
-        <div class="color-box" style="background-color:${shade}"></div>
-        <div class="label">${i < 5 ? `Light ${5 - i}` : i === 5 ? 'Base' : `Dark ${i - 5}`}</div>
-        <div class="hex">${shade}</div>
-      `;
-      div.onclick = () => {
-        setBaseColor(shade);
-      };
-      shadesContainer.appendChild(div);
-    });
-  }
+        function renderShades() {
+            const shades = generateShades(baseColor);
+            shadesContainer.innerHTML = '';
+            shades.forEach((shade, i) => {
+                const div = document.createElement('div');
+                div.className = 'color-card';
+                div.innerHTML = `
+                    <div class="color-box" style="background-color:${shade}"></div>
+                    <div class="label">${i < 5 ? `Light ${5 - i}` : i === 5 ? 'Base' : `Dark ${i - 5}`}</div>
+                    <div class="hex">${shade}</div>
+                `;
+                div.onclick = () => {
+                    setBaseColor(shade);
+                };
+                shadesContainer.appendChild(div);
+            });
+        }
 
-  // Color Harmonies
-  function generateHarmonyColors(baseHex, harmonyType) {
-    const baseHsl = rgbToHsl(...Object.values(hexToRgb(baseHex)));
-    const h = baseHsl.h;
-    const s = baseHsl.s;
-    const l = baseHsl.l;
+        // Color Harmonies
+        function generateHarmonyColors(baseHex, harmonyType) {
+            const baseHsl = rgbToHsl(...Object.values(hexToRgb(baseHex)));
+            const h = baseHsl.h;
+            const s = baseHsl.s;
+            const l = baseHsl.l;
 
-    let hues = [];
+            let hues = [];
 
-    switch (harmonyType) {
-      case 'complementary':
-        hues = [h, (h + 180) % 360];
-        break;
-      case 'analogous':
-        hues = [(h + 30) % 360, h, (h + 330) % 360];
-        break;
-      case 'splitComplementary':
-        hues = [(h + 150) % 360, h, (h + 210) % 360];
-        break;
-      case 'triadic':
-        hues = [h, (h + 120) % 360, (h + 240) % 360];
-        break;
-      case 'tetradic':
-        hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
-        break;
-      case 'square':
-        hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
-        break;
-      default:
-        hues = [h];
-    }
+            switch (harmonyType) {
+                case 'complementary':
+                    hues = [h, (h + 180) % 360];
+                    break;
+                case 'analogous':
+                    hues = [(h + 30) % 360, h, (h + 330) % 360];
+                    break;
+                case 'splitComplementary':
+                    hues = [(h + 150) % 360, h, (h + 210) % 360];
+                    break;
+                case 'triadic':
+                    hues = [h, (h + 120) % 360, (h + 240) % 360];
+                    break;
+                case 'tetradic':
+                    hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
+                    break;
+                case 'square':
+                    hues = [h, (h + 90) % 360, (h + 180) % 360, (h + 270) % 360];
+                    break;
+                default:
+                    hues = [h];
+            }
 
-    return hues.map(hue => rgbToHex(...Object.values(hslToRgb(hue, s, l))));
-  }
+            return hues.map(hue => rgbToHex(...Object.values(hslToRgb(hue, s, l))));
+        }
 
-  function renderHarmony() {
-    const type = harmonyTypeSelect.value;
-    const colors = generateHarmonyColors(baseColor, type);
-    harmonyContainer.innerHTML = '';
-    colors.forEach((color, i) => {
-      const div = document.createElement('div');
-      div.className = 'color-card';
-      div.innerHTML = `
-        <div class="color-box" style="background-color:${color}"></div>
-        <div class="label">${capitalizeFirst(type)} ${i + 1}</div>
-        <div class="hex">${color}</div>
-      `;
-      div.onclick = () => setBaseColor(color);
-      harmonyContainer.appendChild(div);
-    });
-  }
+        function renderHarmony() {
+            const type = harmonyTypeSelect.value;
+            const colors = generateHarmonyColors(baseColor, type);
+            harmonyContainer.innerHTML = '';
+            colors.forEach((color, i) => {
+                const div = document.createElement('div');
+                div.className = 'color-card';
+                div.innerHTML = `
+                    <div class="color-box" style="background-color:${color}"></div>
+                    <div class="label">${capitalizeFirst(type)} ${i + 1}</div>
+                    <div class="hex">${color}</div>
+                `;
+                div.onclick = () => setBaseColor(color);
+                harmonyContainer.appendChild(div);
+            });
+        }
 
-  harmonyTypeSelect.addEventListener('change', renderHarmony);
+        harmonyTypeSelect.addEventListener('change', renderHarmony);
 
-  // Gradient Generator
-  function createGradientColorInput(value, index) {
-    const input = document.createElement('input');
-    input.type = 'color';
-    input.value = value;
-    input.style.width = '3rem';
-    input.style.height = '2rem';
-    input.style.borderRadius = '6px';
-    input.style.border = '1px solid #ccc';
-    input.title = `Gradient color stop ${index + 1}`;
-    input.addEventListener('input', e => {
-      gradientStops[index] = e.target.value.toUpperCase();
-      updateGradient();
-    });
-    return input;
-  }
+        // Gradient Generator
+        function createGradientColorInput(value, index) {
+            const input = document.createElement('input');
+            input.type = 'color';
+            input.value = value;
+            input.style.width = '3rem';
+            input.style.height = '2rem';
+            input.style.borderRadius = '0.375rem';
+            input.style.border = '1px solid #e5e7eb';
+            input.title = `Gradient color stop ${index + 1}`;
+            input.addEventListener('input', e => {
+                gradientStops[index] = e.target.value.toUpperCase();
+                updateGradient();
+            });
+            return input;
+        }
 
-  function renderGradientColors() {
-    gradientColorsContainer.innerHTML = '';
-    gradientStops.forEach((color, i) => {
-      gradientColorsContainer.appendChild(createGradientColorInput(color, i));
-    });
-  }
+        function renderGradientColors() {
+            gradientColorsContainer.innerHTML = '';
+            gradientStops.forEach((color, i) => {
+                gradientColorsContainer.appendChild(createGradientColorInput(color, i));
+            });
+        }
 
-  addGradientColorBtn.addEventListener('click', () => {
-    if (gradientStops.length < 10) {
-      gradientStops.push(baseColor);
-      renderGradientColors();
-      updateGradient();
-    }
-  });
+        addGradientColorBtn.addEventListener('click', () => {
+            if (gradientStops.length < 10) {
+                gradientStops.push(baseColor);
+                renderGradientColors();
+                updateGradient();
+            }
+        });
 
-  gradientAngleInput.addEventListener('input', e => {
-    gradientAngle = +e.target.value;
-    angleValueSpan.textContent = gradientAngle;
-    updateGradient();
-  });
+        gradientAngleInput.addEventListener('input', e => {
+            gradientAngle = +e.target.value;
+            angleValueSpan.textContent = gradientAngle;
+            updateGradient();
+        });
 
-  function updateGradient() {
-    const css = `linear-gradient(${gradientAngle}deg, ${gradientStops.join(', ')})`;
-    gradientPreview.style.background = css;
-    gradientCSS.value = `background: ${css};`;
-  }
+        function updateGradient() {
+          const sortedStops = [...gradientStops].sort();
+            const css = `linear-gradient(${gradientAngle}deg, ${sortedStops.join(', ')})`;
+            gradientPreview.style.background = css;
+            gradientCSS.value = `background: ${css};`;
+        }
 
-  // Color Blindness Simulator
-  // Matrix filters for protanopia, deuteranopia, tritanopia
-  const cbMatrices = {
-    protanopia: [
-      0.567, 0.433, 0, 0, 0,
-      0.558, 0.442, 0, 0, 0,
-      0, 0.242, 0.758, 0, 0,
-      0, 0, 0, 1, 0
-    ],
-    deuteranopia: [
-      0.625, 0.375, 0, 0, 0,
-      0.7, 0.3, 0, 0, 0,
-      0, 0.3, 0.7, 0, 0,
-      0, 0, 0, 1, 0
-    ],
-    tritanopia: [
-      0.95, 0.05, 0, 0, 0,
-      0, 0.433, 0.567, 0, 0,
-      0, 0.475, 0.525, 0, 0,
-      0, 0, 0, 1, 0
-    ],
-  };
+        // Color Blindness Simulator
+        // Matrix filters for protanopia, deuteranopia, tritanopia
+        const cbMatrices = {
+            protanopia: [
+                0.567, 0.433, 0, 0, 0,
+                0.558, 0.442, 0, 0, 0,
+                0, 0.242, 0.758, 0, 0,
+                0, 0, 0, 1, 0
+            ],
+            deuteranopia: [
+                0.625, 0.375, 0, 0, 0,
+                0.7, 0.3, 0, 0, 0,
+                0, 0.3, 0.7, 0, 0,
+                0, 0, 0, 1, 0
+            ],
+            tritanopia: [
+                0.95, 0.05, 0, 0, 0,
+                0, 0.433, 0.567, 0, 0,
+                0, 0.475, 0.525, 0, 0,
+                0, 0, 0, 1, 0
+            ],
+        };
 
-  function applyColorBlindnessFilter(colors, type) {
-    if (type === 'none') return colors;
-    const matrix = cbMatrices[type];
-    return colors.map(hex => {
-      const { r, g, b } = hexToRgb(hex);
-      const nr = clamp(
-        matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * 255 + matrix[4],
-        0,
-        255
-      );
-      const ng = clamp(
-        matrix[5] * r + matrix[6] * g + matrix[7] * b + matrix[8] * 255 + matrix[9],
-        0,
-        255
-      );
-      const nb = clamp(
-        matrix[10] * r + matrix[11] * g + matrix[12] * b + matrix[13] * 255 + matrix[14],
-        0,
-        255
-      );
-      return rgbToHex(nr, ng, nb);
-    });
-  }
+        function applyColorBlindnessFilter(colors, type) {
+            if (type === 'none') return colors;
+            const matrix = cbMatrices[type];
+            return colors.map(hex => {
+                const { r, g, b } = hexToRgb(hex);
+                const nr = clamp(
+                    matrix[0] * r + matrix[1] * g + matrix[2] * b + matrix[3] * 255 + matrix[4],
+                    0,
+                    255
+                );
+                const ng = clamp(
+                    matrix[5] * r + matrix[6] * g + matrix[7] * b + matrix[8] * 255 + matrix[9],
+                    0,
+                    255
+                );
+                const nb = clamp(
+                    matrix[10] * r + matrix[11] * g + matrix[12] * b + matrix[13] * 255 + matrix[14],
+                    0,
+                    255
+                );
+                return rgbToHex(nr, ng, nb);
+            });
+        }
 
-  function renderColorBlindnessPreview() {
-    const type = colorBlindnessTypeSelect.value;
-    const colors = generateShades(baseColor);
-    const filteredColors = applyColorBlindnessFilter(colors, type);
-    cbPalettePreview.innerHTML = '';
-    filteredColors.forEach(color => {
-      const div = document.createElement('div');
-      div.className = 'color-card';
-      div.innerHTML = `<div class="color-box" style="background-color:${color}"></div><div class="hex">${color}</div>`;
-      cbPalettePreview.appendChild(div);
-    });
-  }
+        function renderColorBlindnessPreview() {
+            const type = colorBlindnessTypeSelect.value;
+            const colors = generateShades(baseColor);
+            const filteredColors = applyColorBlindnessFilter(colors, type);
+            cbPalettePreview.innerHTML = '';
+            filteredColors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'color-card';
+                div.innerHTML = `<div class="color-box" style="background-color:${color}"></div><div class="hex">${color}</div>`;
+                cbPalettePreview.appendChild(div);
+            });
+        }
 
-  colorBlindnessTypeSelect.addEventListener('change', renderColorBlindnessPreview);
+        colorBlindnessTypeSelect.addEventListener('change', renderColorBlindnessPreview);
 
-  // Live Preview Panel - update CSS variables
-  function updateLivePreview() {
-    document.documentElement.style.setProperty('--primary', baseColor);
-    // Adjust secondary and background colors based on base color for contrast
-    const baseRgb = hexToRgb(baseColor);
-    const baseLuminance = (0.299 * baseRgb.r + 0.587 * baseRgb.g + 0.114 * baseRgb.b) / 255;
-    const secondaryColor = baseLuminance > 0.5 ? '#333' : '#ddd';
-    const backgroundColor = baseLuminance > 0.5 ? '#f9f9f9' : '#222';
-    document.documentElement.style.setProperty('--secondary', secondaryColor);
-    document.documentElement.style.setProperty('--background', backgroundColor);
+        // Live Preview Panel - update CSS variables
+        function updateLivePreview() {
+            document.documentElement.style.setProperty('--primary', baseColor);
+            // Adjust secondary and background colors based on base color for contrast
+            const baseRgb = hexToRgb(baseColor);
+            const baseLuminance = (0.299 * baseRgb.r + 0.587 * baseRgb.g + 0.114 * baseRgb.b) / 255;
+            const secondaryColor = baseLuminance > 0.5 ? '#333' : '#ddd';
+            const backgroundColor = baseLuminance > 0.5 ? '#f9f9f9' : '#222';
+            document.documentElement.style.setProperty('--primary-text', baseLuminance > 0.5 ? '#fff': '#000');
+            document.documentElement.style.setProperty('--primary-hover', baseLuminance > 0.5 ? '#0056b3' : '#004080');
+            document.documentElement.style.setProperty('--card-bg', baseLuminance > 0.5 ? '#e0e7ff' : '#2d3748');
+             document.documentElement.style.setProperty('--card-text', baseLuminance > 0.5 ? '#000': '#fff');
 
-    // Update live preview panel styling
-    livePreviewPanel.style.backgroundColor = 'var(--background)';
-    livePreviewPanel.style.color = 'var(--secondary)';
-  }
+            // Update live preview panel styling
+            livePreviewPanel.style.backgroundColor = 'var(--background)';
+            livePreviewPanel.style.color = 'var(--secondary)';
+        }
 
-  // Typography Pairing Suggestions
-  const fontPairs = {
-    'roboto-merriweather': ['Roboto, sans-serif', 'Merriweather, serif'],
-    'open-sans-lora': ['"Open Sans", sans-serif', 'Lora, serif'],
-    'montserrat-roboto': ['Montserrat, sans-serif', 'Roboto, sans-serif'],
-    'poppins-roboto': ['Poppins, sans-serif', 'Roboto, sans-serif'],
-    'playfair-display-raleway': ['"Playfair Display", serif', 'Raleway, sans-serif'],
-  };
+        // Typography Pairing Suggestions
+        const fontPairs = {
+            'roboto-merriweather': ['Roboto, sans-serif', 'Merriweather, serif'],
+            'open-sans-lora': ['"Open Sans", sans-serif', 'Lora, serif'],
+            'montserrat-roboto': ['Montserrat, sans-serif', 'Roboto, sans-serif'],
+            'poppins-roboto': ['Poppins, sans-serif', 'Roboto, sans-serif'],
+            'playfair-display-raleway': ['"Playfair Display", serif', 'Raleway, sans-serif'],
+        };
 
-  fontPairSelect.addEventListener('change', () => {
-    const selected = fontPairSelect.value;
-    const [headingFont, bodyFont] = fontPairs[selected];
-    headingSample.style.fontFamily = headingFont;
-    bodySample.style.fontFamily = bodyFont;
-  });
+        fontPairSelect.addEventListener('change', () => {
+            const selected = fontPairSelect.value;
+            const [headingFont, bodyFont] = fontPairs[selected];
+            headingSample.style.fontFamily = headingFont;
+            bodySample.style.fontFamily = bodyFont;
+        });
 
-  // Eye Dropper API usage
-  if ('EyeDropper' in window) {
-    eyeDropperBtn.style.display = 'inline-block';
-    eyeDropperBtn.addEventListener('click', async () => {
-      try {
-        const eyeDropper = new EyeDropper();
-        const result = await eyeDropper.open();
-        setBaseColor(result.sRGBHex);
-      } catch (e) {
-        alert('EyeDropper cancelled or not supported.');
-      }
-    });
-  } else {
-    eyeDropperBtn.style.display = 'none';
-  }
+        // Eye Dropper API usage
+        if ('EyeDropper' in window) {
+            eyeDropperBtn.style.display = 'flex';
+            eyeDropperBtn.addEventListener('click', async () => {
+                try {
+                    const eyeDropper = new EyeDropper();
+                    const result = await eyeDropper.open();
+                    setBaseColor(result.sRGBHex);
+                } catch (e) {
+                    alert('EyeDropper cancelled or not supported.');
+                }
+            });
+        } else {
+            eyeDropperBtn.style.display = 'none';
+        }
 
-  // Update all views when base color changes
-  function updateAll() {
-    renderShades();
-    renderHarmony();
-    renderGradientColors();
-    updateGradient();
-    renderColorBlindnessPreview();
-    updateLivePreview();
-  }
+        // Dark mode toggle functionality
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            body.classList.toggle('dark-mode', darkMode);
+        }
 
-  // Initialize on load
-  setBaseColor(baseColor);
-  updateAll();
+        // Initial dark mode state check
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            toggleDarkMode();
+        }
 
-</script>
+        // Update all views when base color changes
+        function updateAll() {
+            renderShades();
+            renderHarmony();
+            renderGradientColors();
+            updateGradient();
+            renderColorBlindnessPreview();
+            updateLivePreview();
+        }
+
+        // Initialize on load
+        setBaseColor(baseColor);
+        updateAll();
+    </script>
 </body>
 </html>
