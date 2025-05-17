@@ -512,7 +512,7 @@
       div.className = 'color-card';
       div.innerHTML = `
         <div class="color-box" style="background-color:${shade}"></div>
-        <div class="label">${i < 5 ? Light ${5 - i} : i === 5 ? 'Base' : Dark ${i - 5}}</div>
+        <div class="label">${i < 5 ? `Light ${5 - i}` : i === 5 ? 'Base' : `Dark ${i - 5}`}</div>
         <div class="hex">${shade}</div>
       `;
       div.onclick = () => {
@@ -585,7 +585,7 @@
     input.style.height = '2rem';
     input.style.borderRadius = '6px';
     input.style.border = '1px solid #ccc';
-    input.title = Gradient color stop ${index + 1};
+    input.title = `Gradient color stop ${index + 1}`;
     input.addEventListener('input', e => {
       gradientStops[index] = e.target.value.toUpperCase();
       updateGradient();
@@ -615,9 +615,9 @@
   });
 
   function updateGradient() {
-    const css = linear-gradient(${gradientAngle}deg, ${gradientStops.join(', ')});
+    const css = `linear-gradient(${gradientAngle}deg, ${gradientStops.join(', ')})`;
     gradientPreview.style.background = css;
-    gradientCSS.value = background: ${css};;
+    gradientCSS.value = `background: ${css};`;
   }
 
   // Color Blindness Simulator
@@ -675,7 +675,7 @@
     filteredColors.forEach(color => {
       const div = document.createElement('div');
       div.className = 'color-card';
-      div.innerHTML = <div class="color-box" style="background-color:${color}"></div><div class="hex">${color}</div>;
+      div.innerHTML = `<div class="color-box" style="background-color:${color}"></div><div class="hex">${color}</div>`;
       cbPalettePreview.appendChild(div);
     });
   }
